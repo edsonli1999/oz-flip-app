@@ -9,6 +9,11 @@ const AusConverter = () => {
   const [timezoneName, setTimezoneName] = useState('');
   const [calculationResult, setCalculationResult] = useState(null);
 
+  /**
+   * Converts USD to AUD and a timestamp to Melbourne time.
+   * A beaut function, this one handles currency and time conversion
+   * while ensuring results are fair dinkum for Oz.
+   */
   const handleConvert = async () => {
     if (usdAmount) {
       const exRate = await fetchExchangeRate();
@@ -17,6 +22,7 @@ const AusConverter = () => {
       setAudAmount(audValue.toFixed(2));
     }
 
+    // Convert timestamp to Melbourne time
     if (timestamp) {
       try {
         const timestampNum = parseInt(timestamp);
@@ -33,11 +39,13 @@ const AusConverter = () => {
             hour12: true
           }).format(date);
 
+          // Determine if it's AEDT or AEST
           const offsetMinutes = new Date(date).toLocaleString('en-AU', {
             timeZone: 'Australia/Melbourne',
             timeZoneName: 'short'
           });
 
+          // Check if it's AEDT (UTC+11) or AEST (UTC+10)
           const isDST = offsetMinutes.includes('AEDT');
           const timeZone = isDST ? 'AEDT: UTC+11' : 'AEST: UTC+10';
 
@@ -57,7 +65,7 @@ const AusConverter = () => {
     const lines = inputString.split('\n').filter(line => line.trim() !== '');
 
     let totalHours = 0, totalMinutes = 0, totalUsd = 0;
-    
+
     // Parse each line
     for (const line of lines) {
       if (line.startsWith('$')) {
@@ -68,7 +76,7 @@ const AusConverter = () => {
         totalMinutes += parseInt(minutes.replace('min', ''));
       }
     }
-    
+
     totalHours += Math.floor(totalMinutes / 60);
     totalMinutes = totalMinutes % 60;
 
@@ -82,7 +90,7 @@ const AusConverter = () => {
     });
   };
 
-  
+
 
   /**
    * Fetches the latest exchange rate for USD to AUD.
@@ -94,9 +102,12 @@ const AusConverter = () => {
    */
   const fetchExchangeRate = async () => {
     const targetCurrency = 'AUD';
+    
+    // Note: Since this is API key is free and doesn't reveal much sensitive info
+    // I'll decide to just host on github despite it technically being bad practice
     const appId = 'b90b688b584a4915a811adf3379dc9fe';
-
     const url = `https://openexchangerates.org/api/latest.json?app_id=${appId}&symbols=${targetCurrency}&prettyprint=false`;
+
 
     try {
       const response = await fetch(url);
@@ -134,7 +145,7 @@ const AusConverter = () => {
           />
           {audAmount !== null && (
             <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
-              <p className="text-black">AUD: ${audAmount}</p> 
+              <p className="text-black">AUD: ${audAmount}</p>
             </div>
           )}
         </div>
@@ -151,13 +162,13 @@ const AusConverter = () => {
           />
           {melbourneTime && (
             <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-black">{melbourneTime}</p> 
-              <p className="text-sm text-black">{timezoneName}</p> 
+              <p className="text-black">{melbourneTime}</p>
+              <p className="text-sm text-black">{timezoneName}</p>
             </div>
           )}
         </div>
       </div>
-      
+
       <button
         onClick={handleConvert}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
