@@ -7,30 +7,21 @@ const AusConverter = () => {
   const [audAmount, setAudAmount] = useState(null);
   const [melbourneTime, setMelbourneTime] = useState(null);
   const [timezoneName, setTimezoneName] = useState('');
+  const [calculationResult, setCalculationResult] = useState(null);
 
-  /**
-   * Converts USD to AUD and a timestamp to Melbourne time.
-   * A beaut function, this one handles currency and time conversion
-   * while ensuring results are fair dinkum for Oz.
-   */
   const handleConvert = async () => {
-    // Convert USD to AUD
     if (usdAmount) {
       const exRate = await fetchExchangeRate();
       console.log(`Stoked, currently 1 USD = ${exRate} AUD`);
-
       const audValue = parseFloat(usdAmount) * exRate;
       setAudAmount(audValue.toFixed(2));
     }
 
-    // Convert timestamp to Melbourne time
     if (timestamp) {
       try {
         const timestampNum = parseInt(timestamp);
         if (!isNaN(timestampNum)) {
           const date = new Date(timestampNum);
-
-          // Format date to Melbourne time
           const melbourneTimeStr = new Intl.DateTimeFormat('en-AU', {
             timeZone: 'Australia/Melbourne',
             year: 'numeric',
@@ -42,13 +33,11 @@ const AusConverter = () => {
             hour12: true
           }).format(date);
 
-          // Determine if it's AEDT or AEST
           const offsetMinutes = new Date(date).toLocaleString('en-AU', {
             timeZone: 'Australia/Melbourne',
             timeZoneName: 'short'
           });
 
-          // Check if it's AEDT (UTC+11) or AEST (UTC+10)
           const isDST = offsetMinutes.includes('AEDT');
           const timeZone = isDST ? 'AEDT: UTC+11' : 'AEST: UTC+10';
 
@@ -62,6 +51,38 @@ const AusConverter = () => {
       }
     }
   };
+
+  const calculateTotals = async (inputString) => {
+    // Split the input into lines
+    const lines = inputString.split('\n').filter(line => line.trim() !== '');
+
+    let totalHours = 0, totalMinutes = 0, totalUsd = 0;
+    
+    // Parse each line
+    for (const line of lines) {
+      if (line.startsWith('$')) {
+        totalUsd += parseFloat(line.substring(1));
+      } else if (line.includes('h') && line.includes('min')) {
+        const [hours, minutes] = line.split(' ');
+        totalHours += parseInt(hours);
+        totalMinutes += parseInt(minutes.replace('min', ''));
+      }
+    }
+    
+    totalHours += Math.floor(totalMinutes / 60);
+    totalMinutes = totalMinutes % 60;
+
+    const exRate = await fetchExchangeRate();
+    const totalAud = (totalUsd * exRate).toFixed(2);
+
+    setCalculationResult({
+      totalTime: `${totalHours}h ${totalMinutes}min`,
+      totalUsd: totalUsd.toFixed(2),
+      totalAud
+    });
+  };
+
+  
 
   /**
    * Fetches the latest exchange rate for USD to AUD.
@@ -113,7 +134,7 @@ const AusConverter = () => {
           />
           {audAmount !== null && (
             <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
-              <p className="text-black">AUD: ${audAmount}</p> {/* Ensure text is visible */}
+              <p className="text-black">AUD: ${audAmount}</p> 
             </div>
           )}
         </div>
@@ -130,19 +151,41 @@ const AusConverter = () => {
           />
           {melbourneTime && (
             <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-black">{melbourneTime}</p> {/* Ensure text is visible */}
-              <p className="text-sm text-black">{timezoneName}</p> {/* Ensure text is visible */}
+              <p className="text-black">{melbourneTime}</p> 
+              <p className="text-sm text-black">{timezoneName}</p> 
             </div>
           )}
         </div>
       </div>
-
+      
       <button
         onClick={handleConvert}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
       >
         Give it a burl!
       </button>
+
+      {/* Textarea for input string and a button for calculating totals */}
+      <textarea
+        rows="6"
+        className="w-full p-2 mt-4 border border-gray-300 rounded"
+        placeholder="Enter the details here..."
+        id="detailsInput"
+      ></textarea>
+      <button
+        onClick={() => calculateTotals(document.getElementById('detailsInput').value)}
+        className="w-full bg-green-500 mt-4 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
+      >
+        Calculate Totals
+      </button>
+
+      {calculationResult && (
+        <div className="mt-4 p-2 bg-yellow-50 border border-yellow-200 rounded">
+          <p className="text-black">Total time: {calculationResult.totalTime}</p>
+          <p className="text-black">Total amount (USD): ${calculationResult.totalUsd}</p>
+          <p className="text-black">Total amount (AUD): ${calculationResult.totalAud}</p>
+        </div>
+      )}
     </div>
   );
 };
