@@ -19,7 +19,6 @@ const AusConverter = () => {
       const exRate = await fetchExchangeRate();
       console.log(`Stoked, currently 1 USD = ${exRate} AUD`);
 
-      // Correct the arithmetic error here; use * instead of **
       const audValue = parseFloat(usdAmount) * exRate;
       setAudAmount(audValue.toFixed(2));
     }
