@@ -157,7 +157,7 @@ const AusConverter = () => {
   // Dynamic classes based on theme
   const textColor = isDarkMode ? 'text-white' : 'text-black';
   const containerBg = isDarkMode ? 'bg-black/40 border-black/20' : 'bg-white/30 border-white/20';
-  const inputBg = isDarkMode ? 'bg-black/20 border-gray-700/30' : 'bg-white/20 border-white/30';
+  const inputBg = isDarkMode ? 'bg-gray-800/30 border-gray-700/30' : 'bg-white/20 border-white/30'; // Changed dark mode input shade
   const resultBgGreen = isDarkMode ? 'bg-green-900/20 border-green-700/30' : 'bg-green-100/20 border-green-200/30';
   const resultBgBlue = isDarkMode ? 'bg-blue-900/20 border-blue-700/30' : 'bg-blue-100/20 border-blue-200/30';
   const resultBgPurple = isDarkMode ? 'bg-purple-900/20 border-purple-700/30' : 'bg-purple-100/20 border-purple-200/30';
@@ -175,10 +175,10 @@ const AusConverter = () => {
     >
       {/* Blurry Color Blobs Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/40 rounded-full filter blur-3xl"></div>
-        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-blue-500/40 rounded-full filter blur-3xl"></div>
-        <div className="absolute top-1/2 -left-20 w-60 h-60 bg-pink-500/40 rounded-full filter blur-3xl"></div>
-        <div className="absolute top-1/3 -right-20 w-60 h-60 bg-green-500/40 rounded-full filter blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-80 h-80 bg-purple-500/40 rounded-full filter blur-3xl"></div> {/* Moved closer */}
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/40 rounded-full filter blur-3xl"></div> {/* Moved closer */}
+        <div className="absolute top-1/3 left-1/4 w-60 h-60 bg-pink-500/40 rounded-full filter blur-3xl"></div> {/* Moved closer */}
+        <div className="absolute top-1/4 right-1/4 w-60 h-60 bg-green-500/40 rounded-full filter blur-3xl"></div> {/* Moved closer */}
       </div>
 
       <div className={`max-w-lg mx-auto p-6 backdrop-blur-lg ${containerBg} border rounded-xl shadow-lg relative z-10`}>
